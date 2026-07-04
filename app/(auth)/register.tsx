@@ -5,18 +5,16 @@ import { useState } from "react";
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-
-export default function register() {
+export default function Register() {
   const [showPassword, setShowPassword] = useState(true);
   const [showConfirmPassword, setShowConfirmPassword] = useState(true);
-  
 
   const [focusedField, setFocusedField] = useState<string | null>(null);
 
   return (
     <SafeAreaView style={styles.container}>
       {/* heading and welcome text */}
-    <StatusBar style="dark"/>
+      <StatusBar style="dark" />
       <View
         style={{
           marginTop: 35,
@@ -35,19 +33,19 @@ export default function register() {
           gap: 15,
         }}
       >
-        <TextInput  
+        <TextInput
           style={[
-            styles.inputField, 
-            focusedField === "name" && styles.inputFieldFocused
+            styles.inputField,
+            focusedField === "name" && styles.inputFieldFocused,
           ]}
-          placeholder="Full Name" 
+          placeholder="Full Name"
           onFocus={() => setFocusedField("name")}
           onBlur={() => setFocusedField(null)}
         />
         <TextInput
           style={[
-            styles.inputField, 
-            focusedField === "email" && styles.inputFieldFocused
+            styles.inputField,
+            focusedField === "email" && styles.inputFieldFocused,
           ]}
           placeholder="Email Address"
           keyboardType="email-address"
@@ -57,8 +55,8 @@ export default function register() {
         />
         <TextInput
           style={[
-            styles.inputField, 
-            focusedField === "phone" && styles.inputFieldFocused
+            styles.inputField,
+            focusedField === "phone" && styles.inputFieldFocused,
           ]}
           placeholder="Phone Number"
           keyboardType="number-pad"
@@ -72,8 +70,8 @@ export default function register() {
               right: 15,
               top: 6,
               zIndex: 2,
-              padding:10,
-              borderRadius:"100%"
+              padding: 10,
+              borderRadius: "100%",
             }}
             onPress={() => setShowPassword(!showPassword)}
           >
@@ -85,8 +83,8 @@ export default function register() {
           </Pressable>
           <TextInput
             style={[
-              styles.inputField, 
-              focusedField === "password" && styles.inputFieldFocused
+              styles.inputField,
+              focusedField === "password" && styles.inputFieldFocused,
             ]}
             placeholder="Password"
             secureTextEntry={showPassword}
@@ -95,15 +93,15 @@ export default function register() {
             onBlur={() => setFocusedField(null)}
           />
         </View>
-         <View style={{ position: "relative" }}>
+        <View style={{ position: "relative" }}>
           <Pressable
             style={{
               position: "absolute",
               right: 15,
               top: 6,
               zIndex: 2,
-              padding:10,
-              borderRadius:"100%"
+              padding: 10,
+              borderRadius: "100%",
             }}
             onPress={() => setShowConfirmPassword(!showConfirmPassword)}
           >
@@ -115,8 +113,8 @@ export default function register() {
           </Pressable>
           <TextInput
             style={[
-              styles.inputField, 
-              focusedField === "confirmPassword" && styles.inputFieldFocused
+              styles.inputField,
+              focusedField === "confirmPassword" && styles.inputFieldFocused,
             ]}
             placeholder="Confirm Password"
             secureTextEntry={showConfirmPassword}
@@ -125,12 +123,9 @@ export default function register() {
             onBlur={() => setFocusedField(null)}
           />
         </View>
-      
-        <Pressable 
-          style={({ pressed }) => [
-            styles.btn,
-            pressed && styles.btnPressed
-          ]}
+
+        <Pressable
+          style={({ pressed }) => [styles.btn, pressed && styles.btnPressed]}
         >
           <Text
             style={{
@@ -189,22 +184,22 @@ export default function register() {
           }}
         >
           {/* google */}
-        
-          <Pressable 
+
+          <Pressable
             style={({ pressed }) => [
               styles.authBtn,
-              pressed && styles.authBtnPressed
+              pressed && styles.authBtnPressed,
             ]}
           >
             <AntDesign name="google" size={24} color="#DB4437" />
             <Text>Google</Text>
           </Pressable>
           {/* apple */}
-         
-          <Pressable 
+
+          <Pressable
             style={({ pressed }) => [
               styles.authBtn,
-              pressed && styles.authBtnPressed
+              pressed && styles.authBtnPressed,
             ]}
           >
             <FontAwesome name="apple" size={24} color="black" />
@@ -261,7 +256,7 @@ const styles = StyleSheet.create({
     height: 50,
     borderRadius: 20,
   },
- 
+
   btnPressed: {
     backgroundColor: "#E65A2B",
   },
@@ -273,10 +268,10 @@ const styles = StyleSheet.create({
     borderColor: "#E1BFB5",
     borderWidth: 1,
     backgroundColor: "white",
-    fontSize:15,
+    fontSize: 15,
   },
-  inputFieldFocused:{
-    borderColor: "#FF6B35"
+  inputFieldFocused: {
+    borderColor: "#FF6B35",
   },
   authBtn: {
     height: 50,
@@ -291,7 +286,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     gap: 7,
   },
-  
+
   authBtnPressed: {
     backgroundColor: "#F2ECEB",
   },

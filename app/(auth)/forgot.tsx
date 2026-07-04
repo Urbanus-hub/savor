@@ -1,9 +1,10 @@
 import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
+import { Link } from "expo-router";
 import { useState } from "react";
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-export default function forgot() {
+export default function Forgot() {
   const [showPassword, setShowPassword] = useState(true);
   const [showConfirmPassword, setShowConfirmPassword] = useState(true);
   const [isChecked, setChecked] = useState(false);
@@ -17,35 +18,35 @@ export default function forgot() {
           marginTop: 10,
           width: "100%",
           height: "50%",
-         
 
           display: "flex",
           alignItems: "center",
-          justifyContent:"space-around"
+          justifyContent: "space-around",
         }}
       >
-        <View style={
-        {
-          width:80,
-          height:80,
-          borderRadius:"100%",
-          display:"flex",
-          alignItems:"center",
-          justifyContent:"center",
-          backgroundColor:"#FFE9E3"
-        }
-        }>
-
-        <MaterialCommunityIcons name="lock-reset" size={35} color="#AB3500"/>
+        <View
+          style={{
+            width: 80,
+            height: 80,
+            borderRadius: "100%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            backgroundColor: "#FFE9E3",
+          }}
+        >
+          <MaterialCommunityIcons name="lock-reset" size={35} color="#AB3500" />
         </View>
-        <Text style={{
-    width:"75%",
-    textAlign:"center",
-    fontSize:16,
-    lineHeight:24,
-    letterSpacing:0.19
-        }}> 
-          Enter your email address and we'll send you a link to reset your
+        <Text
+          style={{
+            width: "75%",
+            textAlign: "center",
+            fontSize: 16,
+            lineHeight: 24,
+            letterSpacing: 0.19,
+          }}
+        >
+          Enter your email address and we&apos;ll send you a link to reset your
           password.
         </Text>
         <TextInput
@@ -77,6 +78,18 @@ export default function forgot() {
           </Text>
           <Feather name="arrow-right" color="white" size={24} />
         </Pressable>
+
+        <Link
+          href="/(auth)/login"
+          style={{
+            marginTop: 16,
+            color: "#FF6B35",
+            textAlign: "center",
+            fontWeight: "600",
+          }}
+        >
+          Back to sign in
+        </Link>
       </View>
     </SafeAreaView>
   );

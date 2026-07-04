@@ -13,7 +13,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-export default function login() {
+export default function Login() {
   const [showPassword, setShowPassword] = useState(true);
   const [showConfirmPassword, setShowConfirmPassword] = useState(true);
   const [isChecked, setChecked] = useState(false);
@@ -127,7 +127,7 @@ export default function login() {
           style={{
             width: "100%",
             height: 50,
-           
+
             display: "flex",
             flexDirection: "row",
             alignItems: "center",
@@ -144,13 +144,9 @@ export default function login() {
             <Switch value={isChecked} onValueChange={setChecked} />
             <Text>Remember me</Text>
           </View>
-          <Text
-            style={{
-              color: "#FF6B35",
-            }}
-          >
+          <Link href="/(auth)/forgot" style={{ color: "#FF6B35" }}>
             Forgot password?
-          </Text>
+          </Link>
         </View>
 
         <Pressable
@@ -244,7 +240,7 @@ export default function login() {
             gap: 5,
           }}
         >
-          <Text>Don't have an acount?</Text>
+          <Text>Don&apos;t have an acount?</Text>
           <Link
             href="/(auth)/register"
             style={{
