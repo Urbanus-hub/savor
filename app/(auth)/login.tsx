@@ -1,8 +1,9 @@
 import { AntDesign, FontAwesome } from "@expo/vector-icons";
-import { Link } from "expo-router";
+import { Link, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useState } from "react";
 import {
+  ActivityIndicator,
   Image,
   Pressable,
   StyleSheet,
@@ -13,21 +14,78 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { AuthFeedbackModal } from "@/components/AuthFeedbackModal";
+import { login } from "@/services/auth";
+
 export default function Login() {
   const [showPassword, setShowPassword] = useState(true);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(true);
   const [isChecked, setChecked] = useState(false);
   const [focusedField, setFocusedField] = useState<string | null>(null);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [feedbackVisible, setFeedbackVisible] = useState(false);
+  const [feedbackTitle, setFeedbackTitle] = useState("");
+  const [feedbackMessage, setFeedbackMessage] = useState("");
+  const [feedbackType, setFeedbackType] = useState<
+    "success" | "error" | "info"
+  >("info");
+  const router = useRouter();
+
+  const openFeedback = (
+    title: string,
+    message: string,
+    type: "success" | "error" | "info" = "info",
+  ) => {
+    setFeedbackTitle(title);
+    setFeedbackMessage(message);
+    setFeedbackType(type);
+    setFeedbackVisible(true);
+  };
+
+  const handleLogin = async () => {
+    if (!email.trim() || !password.trim()) {
+      openFeedback(
+        "Missing details",
+        "Enter both your email and password.",
+        "error",
+      );
+      return;
+    }
+
+    setLoading(true);
+    const { error } = await login(email.trim(), password);
+    setLoading(false);
+
+    if (error) {
+      openFeedback("Login failed", error.message, "error");
+      return;
+    }
+
+    openFeedback("Welcome back", "You have signed in successfully.", "success");
+  };
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* welcome text */}
+      <AuthFeedbackModal
+        visible={feedbackVisible}
+        title={feedbackTitle}
+        message={feedbackMessage}
+        type={feedbackType}
+        buttonLabel={feedbackType === "success" ? "Continue" : "OK"}
+        onClose={() => {
+          setFeedbackVisible(false);
+          if (feedbackType === "success") {
+            router.replace("/(dash)");
+          }
+        }}
+      />
+
       <View
         style={{
           marginTop: 10,
           width: "100%",
           height: 100,
-
           display: "flex",
           alignItems: "center",
         }}
@@ -35,13 +93,9 @@ export default function Login() {
         <StatusBar style="light" />
         <Text style={styles.heading}>Welcome Back!</Text>
         <Text style={styles.text}>
-          {" "}
           Log in to continue your culinary journey.
         </Text>
       </View>
-      {/* image */}
-
-      {/* overlay */}
 
       <View
         style={{
@@ -69,9 +123,8 @@ export default function Login() {
             inset: 0,
             backgroundColor: "#411b1783",
           }}
-        ></View>
+        />
       </View>
-      {/* input */}
 
       <View
         style={{
@@ -88,6 +141,8 @@ export default function Login() {
           placeholder="Email Address"
           keyboardType="email-address"
           autoCapitalize="none"
+          value={email}
+          onChangeText={setEmail}
           onFocus={() => setFocusedField("email")}
           onBlur={() => setFocusedField(null)}
         />
@@ -100,12 +155,12 @@ export default function Login() {
               top: 6,
               zIndex: 2,
               padding: 10,
-              borderRadius: "100%",
+              borderRadius: 999,
             }}
-            onPress={() => setShowConfirmPassword(!showConfirmPassword)}
+            onPress={() => setShowPassword((current) => !current)}
           >
             <AntDesign
-              name={showConfirmPassword ? "eye" : "eye-invisible"}
+              name={showPassword ? "eye" : "eye-invisible"}
               size={15}
               color="black"
             />
@@ -113,21 +168,22 @@ export default function Login() {
           <TextInput
             style={[
               styles.inputField,
-              focusedField === "confirmPassword" && styles.inputFieldFocused,
+              focusedField === "password" && styles.inputFieldFocused,
             ]}
-            placeholder="Confirm Password"
-            secureTextEntry={showConfirmPassword}
+            placeholder="Password"
+            secureTextEntry={showPassword}
             autoCapitalize="none"
-            onFocus={() => setFocusedField("confirmPassword")}
+            value={password}
+            onChangeText={setPassword}
+            onFocus={() => setFocusedField("password")}
             onBlur={() => setFocusedField(null)}
           />
         </View>
-        {/* remember */}
+
         <View
           style={{
             width: "100%",
             height: 50,
-
             display: "flex",
             flexDirection: "row",
             alignItems: "center",
@@ -144,33 +200,34 @@ export default function Login() {
             <Switch value={isChecked} onValueChange={setChecked} />
             <Text>Remember me</Text>
           </View>
-          <Link href="/(auth)/forgot" style={{ color: "#FF6B35" }}>
+          <Link href="/forgot" style={{ color: "#FF6B35" }}>
             Forgot password?
           </Link>
         </View>
 
         <Pressable
-          style={({ pressed }) => [styles.btn, pressed && styles.btnPressed]}
+          style={({ pressed }) => [
+            styles.btn,
+            pressed && styles.btnPressed,
+            loading && styles.btnDisabled,
+          ]}
+          onPress={handleLogin}
+          disabled={loading}
         >
-          <Text
-            style={{
-              fontSize: 16,
-              fontWeight: "600",
-              color: "white",
-            }}
-          >
-            Sign In
-          </Text>
+          {loading ? (
+            <ActivityIndicator color="white" />
+          ) : (
+            <Text style={styles.btnText}>Sign In</Text>
+          )}
         </Pressable>
       </View>
-      {/* Alternatives */}
+
       <View
         style={{
           borderColor: "red",
           width: "100%",
         }}
       >
-        {/* or */}
         <View
           style={{
             width: "100%",
@@ -187,7 +244,7 @@ export default function Login() {
               backgroundColor: "#E1BFB5",
               width: "30%",
             }}
-          ></View>
+          />
           <Text>OR CONTINUE WITH</Text>
           <View
             style={{
@@ -195,9 +252,9 @@ export default function Login() {
               backgroundColor: "#E1BFB5",
               width: "30%",
             }}
-          ></View>
+          />
         </View>
-        {/* auth buttons */}
+
         <View
           style={{
             display: "flex",
@@ -208,8 +265,6 @@ export default function Login() {
             marginBottom: 25,
           }}
         >
-          {/* google */}
-
           <Pressable
             style={({ pressed }) => [
               styles.authBtn,
@@ -219,7 +274,6 @@ export default function Login() {
             <AntDesign name="google" size={24} color="#DB4437" />
             <Text>Google</Text>
           </Pressable>
-          {/* apple */}
 
           <Pressable
             style={({ pressed }) => [
@@ -231,6 +285,7 @@ export default function Login() {
             <Text>Apple</Text>
           </Pressable>
         </View>
+
         <View
           style={{
             display: "flex",
@@ -240,9 +295,9 @@ export default function Login() {
             gap: 5,
           }}
         >
-          <Text>Don&apos;t have an acount?</Text>
+          <Text>Don&apos;t have an account?</Text>
           <Link
-            href="/(auth)/register"
+            href="/register"
             style={{
               color: "#FF6B35",
             }}
@@ -282,9 +337,16 @@ const styles = StyleSheet.create({
     height: 50,
     borderRadius: 20,
   },
-
   btnPressed: {
     backgroundColor: "#E65A2B",
+  },
+  btnDisabled: {
+    opacity: 0.75,
+  },
+  btnText: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "white",
   },
   inputField: {
     width: "100%",
@@ -312,7 +374,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     gap: 7,
   },
-
   authBtnPressed: {
     backgroundColor: "#F2ECEB",
   },

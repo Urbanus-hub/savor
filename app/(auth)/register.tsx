@@ -1,68 +1,132 @@
 import { AntDesign, FontAwesome } from "@expo/vector-icons";
-import { Link } from "expo-router";
+import { Link, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useState } from "react";
-import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import {
+  ActivityIndicator,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+
+import { AuthFeedbackModal } from "@/components/AuthFeedbackModal";
+import { signup } from "@/services/auth";
 
 export default function Register() {
   const [showPassword, setShowPassword] = useState(true);
   const [showConfirmPassword, setShowConfirmPassword] = useState(true);
-
   const [focusedField, setFocusedField] = useState<string | null>(null);
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [feedbackVisible, setFeedbackVisible] = useState(false);
+  const [feedbackTitle, setFeedbackTitle] = useState("");
+  const [feedbackMessage, setFeedbackMessage] = useState("");
+  const [feedbackType, setFeedbackType] = useState<"success" | "error" | "info">("info");
+  const router = useRouter();
+
+  const openFeedback = (
+    title: string,
+    message: string,
+    type: "success" | "error" | "info" = "info",
+  ) => {
+    setFeedbackTitle(title);
+    setFeedbackMessage(message);
+    setFeedbackType(type);
+    setFeedbackVisible(true);
+  };
+
+  const isValidData = () => {
+    if (!name.trim() || !email.trim() || !phone.trim() || !password.trim() || !confirmPassword.trim()) {
+      openFeedback("Missing details", "Please fill in all the fields.", "error");
+      return false;
+    }
+
+    if (password !== confirmPassword) {
+      openFeedback("Password mismatch", "Password and confirm password must match.", "error");
+      return false;
+    }
+
+    return true;
+  };
+
+  const signUpUser = async () => {
+    if (!isValidData()) {
+      return;
+    }
+
+    setLoading(true);
+    const { error } = await signup(email.trim(), password);
+    setLoading(false);
+
+    if (error) {
+      openFeedback("Sign up failed", error.message, "error");
+      return;
+    }
+
+    openFeedback("Account created", "Your account was created successfully.", "success");
+  };
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* heading and welcome text */}
+      <AuthFeedbackModal
+        visible={feedbackVisible}
+        title={feedbackTitle}
+        message={feedbackMessage}
+        type={feedbackType}
+        buttonLabel={feedbackType === "success" ? "Go to login" : "OK"}
+        onClose={() => {
+          setFeedbackVisible(false);
+          if (feedbackType === "success") {
+            router.replace("/login");
+          }
+        }}
+      />
+
       <StatusBar style="dark" />
-      <View
-        style={{
-          marginTop: 35,
-        }}
-      >
+
+      <View style={{ marginTop: 35 }}>
         <Text style={styles.heading}>Create Account</Text>
-        <Text style={styles.text}>
-          Join GourmetGo to experience premium culinary delights.
-        </Text>
+        <Text style={styles.text}>Join GourmetGo to experience premium culinary delights.</Text>
       </View>
-      {/* input */}
-      <View
-        style={{
-          marginTop: 15,
-          display: "flex",
-          gap: 15,
-        }}
-      >
+
+      <View style={{ marginTop: 15, display: "flex", gap: 15 }}>
         <TextInput
-          style={[
-            styles.inputField,
-            focusedField === "name" && styles.inputFieldFocused,
-          ]}
+          style={[styles.inputField, focusedField === "name" && styles.inputFieldFocused]}
           placeholder="Full Name"
+          value={name}
+          onChangeText={setName}
           onFocus={() => setFocusedField("name")}
           onBlur={() => setFocusedField(null)}
         />
+
         <TextInput
-          style={[
-            styles.inputField,
-            focusedField === "email" && styles.inputFieldFocused,
-          ]}
+          style={[styles.inputField, focusedField === "email" && styles.inputFieldFocused]}
           placeholder="Email Address"
           keyboardType="email-address"
           autoCapitalize="none"
+          value={email}
+          onChangeText={setEmail}
           onFocus={() => setFocusedField("email")}
           onBlur={() => setFocusedField(null)}
         />
+
         <TextInput
-          style={[
-            styles.inputField,
-            focusedField === "phone" && styles.inputFieldFocused,
-          ]}
+          style={[styles.inputField, focusedField === "phone" && styles.inputFieldFocused]}
           placeholder="Phone Number"
           keyboardType="number-pad"
+          value={phone}
+          onChangeText={setPhone}
           onFocus={() => setFocusedField("phone")}
           onBlur={() => setFocusedField(null)}
         />
+
         <View style={{ position: "relative" }}>
           <Pressable
             style={{
@@ -71,28 +135,24 @@ export default function Register() {
               top: 6,
               zIndex: 2,
               padding: 10,
-              borderRadius: "100%",
+              borderRadius: 999,
             }}
-            onPress={() => setShowPassword(!showPassword)}
+            onPress={() => setShowPassword((current) => !current)}
           >
-            <AntDesign
-              name={showPassword ? "eye" : "eye-invisible"}
-              size={15}
-              color="black"
-            />
+            <AntDesign name={showPassword ? "eye" : "eye-invisible"} size={15} color="black" />
           </Pressable>
           <TextInput
-            style={[
-              styles.inputField,
-              focusedField === "password" && styles.inputFieldFocused,
-            ]}
+            style={[styles.inputField, focusedField === "password" && styles.inputFieldFocused]}
             placeholder="Password"
             secureTextEntry={showPassword}
             autoCapitalize="none"
+            value={password}
+            onChangeText={setPassword}
             onFocus={() => setFocusedField("password")}
             onBlur={() => setFocusedField(null)}
           />
         </View>
+
         <View style={{ position: "relative" }}>
           <Pressable
             style={{
@@ -101,15 +161,11 @@ export default function Register() {
               top: 6,
               zIndex: 2,
               padding: 10,
-              borderRadius: "100%",
+              borderRadius: 999,
             }}
-            onPress={() => setShowConfirmPassword(!showConfirmPassword)}
+            onPress={() => setShowConfirmPassword((current) => !current)}
           >
-            <AntDesign
-              name={showConfirmPassword ? "eye" : "eye-invisible"}
-              size={15}
-              color="black"
-            />
+            <AntDesign name={showConfirmPassword ? "eye" : "eye-invisible"} size={15} color="black" />
           </Pressable>
           <TextInput
             style={[
@@ -119,33 +175,27 @@ export default function Register() {
             placeholder="Confirm Password"
             secureTextEntry={showConfirmPassword}
             autoCapitalize="none"
+            value={confirmPassword}
+            onChangeText={setConfirmPassword}
             onFocus={() => setFocusedField("confirmPassword")}
             onBlur={() => setFocusedField(null)}
           />
         </View>
 
         <Pressable
-          style={({ pressed }) => [styles.btn, pressed && styles.btnPressed]}
+          style={({ pressed }) => [
+            styles.btn,
+            pressed && styles.btnPressed,
+            loading && styles.btnDisabled,
+          ]}
+          onPress={signUpUser}
+          disabled={loading}
         >
-          <Text
-            style={{
-              fontSize: 16,
-              fontWeight: "600",
-              color: "white",
-            }}
-          >
-            Create Account
-          </Text>
+          {loading ? <ActivityIndicator color="white" /> : <Text style={styles.btnText}>Create Account</Text>}
         </Pressable>
       </View>
-      {/* Alternatives */}
-      <View
-        style={{
-          borderColor: "red",
-          width: "100%",
-        }}
-      >
-        {/* or */}
+
+      <View style={{ borderColor: "red", width: "100%" }}>
         <View
           style={{
             width: "100%",
@@ -156,23 +206,11 @@ export default function Register() {
             justifyContent: "space-between",
           }}
         >
-          <View
-            style={{
-              height: 1,
-              backgroundColor: "#E1BFB5",
-              width: "30%",
-            }}
-          ></View>
+          <View style={{ height: 1, backgroundColor: "#E1BFB5", width: "30%" }} />
           <Text>OR CONTINUE WITH</Text>
-          <View
-            style={{
-              height: 1,
-              backgroundColor: "#E1BFB5",
-              width: "30%",
-            }}
-          ></View>
+          <View style={{ height: 1, backgroundColor: "#E1BFB5", width: "30%" }} />
         </View>
-        {/* auth buttons */}
+
         <View
           style={{
             display: "flex",
@@ -183,29 +221,17 @@ export default function Register() {
             marginBottom: 25,
           }}
         >
-          {/* google */}
-
-          <Pressable
-            style={({ pressed }) => [
-              styles.authBtn,
-              pressed && styles.authBtnPressed,
-            ]}
-          >
+          <Pressable style={({ pressed }) => [styles.authBtn, pressed && styles.authBtnPressed]}>
             <AntDesign name="google" size={24} color="#DB4437" />
             <Text>Google</Text>
           </Pressable>
-          {/* apple */}
 
-          <Pressable
-            style={({ pressed }) => [
-              styles.authBtn,
-              pressed && styles.authBtnPressed,
-            ]}
-          >
+          <Pressable style={({ pressed }) => [styles.authBtn, pressed && styles.authBtnPressed]}>
             <FontAwesome name="apple" size={24} color="black" />
             <Text>Apple</Text>
           </Pressable>
         </View>
+
         <View
           style={{
             display: "flex",
@@ -215,9 +241,9 @@ export default function Register() {
             gap: 5,
           }}
         >
-          <Text>ALready have an acount?</Text>
+          <Text>Already have an account?</Text>
           <Link
-            href="/(auth)/login"
+            href="/login"
             style={{
               color: "#FF6B35",
             }}
@@ -256,9 +282,16 @@ const styles = StyleSheet.create({
     height: 50,
     borderRadius: 20,
   },
-
   btnPressed: {
     backgroundColor: "#E65A2B",
+  },
+  btnDisabled: {
+    opacity: 0.75,
+  },
+  btnText: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "white",
   },
   inputField: {
     width: "100%",
@@ -286,7 +319,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     gap: 7,
   },
-
   authBtnPressed: {
     backgroundColor: "#F2ECEB",
   },
