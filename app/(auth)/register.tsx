@@ -28,7 +28,9 @@ export default function Register() {
   const [feedbackVisible, setFeedbackVisible] = useState(false);
   const [feedbackTitle, setFeedbackTitle] = useState("");
   const [feedbackMessage, setFeedbackMessage] = useState("");
-  const [feedbackType, setFeedbackType] = useState<"success" | "error" | "info">("info");
+  const [feedbackType, setFeedbackType] = useState<
+    "success" | "error" | "info"
+  >("info");
   const router = useRouter();
 
   const openFeedback = (
@@ -43,13 +45,27 @@ export default function Register() {
   };
 
   const isValidData = () => {
-    if (!name.trim() || !email.trim() || !phone.trim() || !password.trim() || !confirmPassword.trim()) {
-      openFeedback("Missing details", "Please fill in all the fields.", "error");
+    if (
+      !name.trim() ||
+      !email.trim() ||
+      !phone.trim() ||
+      !password.trim() ||
+      !confirmPassword.trim()
+    ) {
+      openFeedback(
+        "Missing details",
+        "Please fill in all the fields.",
+        "error",
+      );
       return false;
     }
 
     if (password !== confirmPassword) {
-      openFeedback("Password mismatch", "Password and confirm password must match.", "error");
+      openFeedback(
+        "Password mismatch",
+        "Password and confirm password must match.",
+        "error",
+      );
       return false;
     }
 
@@ -70,7 +86,11 @@ export default function Register() {
       return;
     }
 
-    openFeedback("Account created", "Your account was created successfully.", "success");
+    openFeedback(
+      "Account created",
+      "Your account was created successfully.",
+      "success",
+    );
   };
 
   return (
@@ -93,12 +113,17 @@ export default function Register() {
 
       <View style={{ marginTop: 35 }}>
         <Text style={styles.heading}>Create Account</Text>
-        <Text style={styles.text}>Join GourmetGo to experience premium culinary delights.</Text>
+        <Text style={styles.text}>
+          Join GourmetGo to experience premium culinary delights.
+        </Text>
       </View>
 
       <View style={{ marginTop: 15, display: "flex", gap: 15 }}>
         <TextInput
-          style={[styles.inputField, focusedField === "name" && styles.inputFieldFocused]}
+          style={[
+            styles.inputField,
+            focusedField === "name" && styles.inputFieldFocused,
+          ]}
           placeholder="Full Name"
           value={name}
           onChangeText={setName}
@@ -107,7 +132,10 @@ export default function Register() {
         />
 
         <TextInput
-          style={[styles.inputField, focusedField === "email" && styles.inputFieldFocused]}
+          style={[
+            styles.inputField,
+            focusedField === "email" && styles.inputFieldFocused,
+          ]}
           placeholder="Email Address"
           keyboardType="email-address"
           autoCapitalize="none"
@@ -118,7 +146,10 @@ export default function Register() {
         />
 
         <TextInput
-          style={[styles.inputField, focusedField === "phone" && styles.inputFieldFocused]}
+          style={[
+            styles.inputField,
+            focusedField === "phone" && styles.inputFieldFocused,
+          ]}
           placeholder="Phone Number"
           keyboardType="number-pad"
           value={phone}
@@ -139,10 +170,17 @@ export default function Register() {
             }}
             onPress={() => setShowPassword((current) => !current)}
           >
-            <AntDesign name={showPassword ? "eye" : "eye-invisible"} size={15} color="black" />
+            <AntDesign
+              name={showPassword ? "eye" : "eye-invisible"}
+              size={15}
+              color="black"
+            />
           </Pressable>
           <TextInput
-            style={[styles.inputField, focusedField === "password" && styles.inputFieldFocused]}
+            style={[
+              styles.inputField,
+              focusedField === "password" && styles.inputFieldFocused,
+            ]}
             placeholder="Password"
             secureTextEntry={showPassword}
             autoCapitalize="none"
@@ -165,7 +203,11 @@ export default function Register() {
             }}
             onPress={() => setShowConfirmPassword((current) => !current)}
           >
-            <AntDesign name={showConfirmPassword ? "eye" : "eye-invisible"} size={15} color="black" />
+            <AntDesign
+              name={showConfirmPassword ? "eye" : "eye-invisible"}
+              size={15}
+              color="black"
+            />
           </Pressable>
           <TextInput
             style={[
@@ -191,7 +233,11 @@ export default function Register() {
           onPress={signUpUser}
           disabled={loading}
         >
-          {loading ? <ActivityIndicator color="white" /> : <Text style={styles.btnText}>Create Account</Text>}
+          {loading ? (
+            <ActivityIndicator color="white" />
+          ) : (
+            <Text style={styles.btnText}>Create Account</Text>
+          )}
         </Pressable>
       </View>
 
@@ -206,9 +252,13 @@ export default function Register() {
             justifyContent: "space-between",
           }}
         >
-          <View style={{ height: 1, backgroundColor: "#E1BFB5", width: "30%" }} />
+          <View
+            style={{ height: 1, backgroundColor: "#E1BFB5", width: "30%" }}
+          />
           <Text>OR CONTINUE WITH</Text>
-          <View style={{ height: 1, backgroundColor: "#E1BFB5", width: "30%" }} />
+          <View
+            style={{ height: 1, backgroundColor: "#E1BFB5", width: "30%" }}
+          />
         </View>
 
         <View
@@ -221,12 +271,22 @@ export default function Register() {
             marginBottom: 25,
           }}
         >
-          <Pressable style={({ pressed }) => [styles.authBtn, pressed && styles.authBtnPressed]}>
+          <Pressable
+            style={({ pressed }) => [
+              styles.authBtn,
+              pressed && styles.authBtnPressed,
+            ]}
+          >
             <AntDesign name="google" size={24} color="#DB4437" />
             <Text>Google</Text>
           </Pressable>
 
-          <Pressable style={({ pressed }) => [styles.authBtn, pressed && styles.authBtnPressed]}>
+          <Pressable
+            style={({ pressed }) => [
+              styles.authBtn,
+              pressed && styles.authBtnPressed,
+            ]}
+          >
             <FontAwesome name="apple" size={24} color="black" />
             <Text>Apple</Text>
           </Pressable>
