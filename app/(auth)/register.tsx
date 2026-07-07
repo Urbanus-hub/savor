@@ -13,7 +13,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { AuthFeedbackModal } from "@/components/AuthFeedbackModal";
-import { signup } from "@/services/auth";
+import { signup ,insertUser} from "@/services/auth";
 
 export default function Register() {
   const [showPassword, setShowPassword] = useState(true);
@@ -78,7 +78,16 @@ export default function Register() {
     }
 
     setLoading(true);
-    const { error } = await signup(email.trim(), password);
+    const { error,data:authData } = await signup(email.trim(), password);
+    if(!error){
+        //insert to users database
+        const { error: userError } = await insertUser(authData?.user?.id||"", name.trim(), email.trim(), phone.trim());
+        if (userError) {
+          openFeedback("Sign up failed", userError.message, "error");
+          setLoading(false);
+          return;
+        }
+    }
     setLoading(false);
 
     if (error) {

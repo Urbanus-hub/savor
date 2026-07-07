@@ -43,10 +43,30 @@ const getSession = async () => {
 
   return session;
 };
+//get full userdetails from supabase database after login and set to context
+const getUserDetails = async () => {
+  const { data: authData, error: authError } = await supabase.auth.getUser();
+
+  if (authError || !authData.user) {
+    return null;
+  }
+
+  const { data, error } = await supabase
+    .from("users")
+    .select("*")
+    .eq("email", authData.user.email ?? "")
+    .single();
+
+  if (error) {
+    return null;
+  }
+
+  return data;
+};
 
 const signOut = async () => {
   const { error } = await supabase.auth.signOut();
   return error;
 };
 
-export { getSession, insertUser, login, signOut, signup };
+export { getSession, getUserDetails, insertUser, login, signOut, signup };

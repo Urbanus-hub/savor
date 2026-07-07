@@ -1,7 +1,7 @@
 import { AntDesign, FontAwesome } from "@expo/vector-icons";
 import { Link, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import {
   ActivityIndicator,
   Image,
@@ -15,7 +15,8 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { AuthFeedbackModal } from "@/components/AuthFeedbackModal";
-import { login } from "@/services/auth";
+import { UserContext } from "@/contexts/userContext";
+import { getUserDetails, login } from "@/services/auth";
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(true);
@@ -31,6 +32,7 @@ export default function Login() {
     "success" | "error" | "info"
   >("info");
   const router = useRouter();
+  const { setUser } = useContext(UserContext) || {};
 
   const openFeedback = (
     title: string,
@@ -54,13 +56,23 @@ export default function Login() {
     }
 
     setLoading(true);
-    const { error } = await login(email.trim(), password);
-    setLoading(false);
+    const { error, data } = await login(email.trim(), password);
+    console.log("Login response:", data, error);
 
     if (error) {
+      setLoading(false);
       openFeedback("Login failed", error.message, "error");
       return;
     }
+
+    const userDetails = await getUserDetails();
+    console.log("User details:", userDetails);
+
+    if (setUser && userDetails) {
+      setUser(userDetails);
+    }
+
+    setLoading(false);
 
     openFeedback("Welcome back", "You have signed in successfully.", "success");
   };
