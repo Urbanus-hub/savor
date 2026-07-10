@@ -1,7 +1,8 @@
 import { UserContext } from "@/contexts/userContext";
 import { getSession } from "@/services/auth";
+import { Feather } from "@expo/vector-icons";
 import { useContext, useEffect, useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { Image, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Index() {
@@ -10,7 +11,24 @@ export default function Index() {
   const [isChecked, setChecked] = useState(false);
   const [focusedField, setFocusedField] = useState<string | null>(null);
   const { user, loading } = useContext(UserContext);
+  const [dayPart,setDayPart]=useState("Morning");
   console.log("user", user);
+  
+ 
+    const currentHour = new Date().getHours();
+    if (currentHour >= 5 && currentHour < 12) {
+    setDayPart("Morning")
+      
+    } else if (currentHour >= 12 && currentHour < 17) {
+      
+      setDayPart("Afternoon")
+    } else if (currentHour >= 17 && currentHour < 21) {
+      setDayPart("Evening")
+      
+    } else {
+     setDayPart("Night")
+    }
+  
   useEffect(() => {
     const loadSession = async () => {
       const session = await getSession();
@@ -21,27 +39,75 @@ export default function Index() {
   }, []);
   return (
     <SafeAreaView style={styles.container}>
-      {/* welcome text */}
+      {/* profile and location */}
       <View
         style={{
-          marginTop: 10,
+          
           width: "100%",
-          height: "50%",
-
           display: "flex",
+          flexDirection: "row",
+          justifyContent: "space-between",
           alignItems: "center",
-          justifyContent: "space-around",
+          paddingVertical: 5,
+         
         }}
       >
-        <Text>Hello there</Text>
-        <Text>{loading}</Text>
-        <Text>
-          {loading
-            ? "Loading..."
-            : user
-              ? `Welcome, ${user.full_name}`
-              : "Not logged in"}
-        </Text>
+        {/* location */}
+        <View
+        style={
+          {
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            gap: 10,
+          }
+        }
+        >
+          <Feather name="map-pin" size={18} color="#FF6B35" />
+          <View style={
+            {
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: 3,
+            }
+          }>
+
+     <Text>Deliver to</Text>
+     <View style={
+        {
+          display: "flex",
+          flexDirection: "row",
+          alignItems: "center",
+          gap: 5,
+        }
+     }>
+       <Text style={{
+        fontWeight:"700",
+        fontSize: 14,
+       }}>Home</Text>
+     <Feather name="chevron-down" size={17} color="black" />
+     </View>
+          </View>
+        </View>
+        {/* profile icon */}
+        <View>
+          <Image
+            source={require("../../assets/images/culinary.jpg")}
+            style={{ width: 40, height: 40, borderRadius: 40 ,
+              borderWidth:1,
+              borderColor:"#FF6B35"
+            }}
+          />
+        </View>
+      </View>
+      {/* welcome */}
+      <View style={{ marginTop: 20,
+      borderWidth:1,
+        
+       }}>
+        <Text style={styles.heading}> Good {dayPart}, {user?.full_name.split(' ')[0]}!</Text>
+        <Text style={styles.text}>What are you craving today?</Text>
       </View>
     </SafeAreaView>
   );
@@ -54,14 +120,14 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   text: {
-    color: "#ffffff",
+    color: "black",
     fontSize: 16,
     fontWeight: "100",
   },
   heading: {
-    color: "white",
-    fontSize: 32,
-    fontWeight: "800",
+    color: "Black",
+    fontSize: 22,
+    fontWeight: "600",
     marginBottom: 8,
   },
   btn: {

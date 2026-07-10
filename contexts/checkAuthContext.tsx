@@ -1,19 +1,71 @@
-import {createContext, useState} from "react";
+import { createContext, useEffect, useState } from "react";
+import { supabase } from "@/utils/supabase"; // adjust path
 
-export const CheckAuthContext = createContext<{
+type AuthContextType = {
   isAuthenticated: boolean;
-  setIsAuthenticated: (isAuthenticated: boolean) => void;
-}>({
-  isAuthenticated: false,
-  setIsAuthenticated: () => {},
-});                 
+  loading: boolean;
+  setIsAuthenticated: (value: boolean) => void;
+};
 
-export const CheckAuthProvider =({ children }: { children: React.ReactNode }) => {
+export const CheckAuthContext = createContext<AuthContextType>({
+  isAuthenticated: false,
+  loading: true,
+  setIsAuthenticated: () => {},
+});
+
+
+export const CheckAuthProvider = ({
+  children,
+}: {
+  children: React.ReactNode;
+}) => {
+
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-    return (
-    <CheckAuthContext.Provider value={{ isAuthenticated, setIsAuthenticated }}>
+  const [loading, setLoading] = useState(true);
+
+
+  useEffect(() => {
+
+    async function checkSession() {
+
+      const { data } = await supabase.auth.getSession();
+      console.log("Session data:", data.session);   
+
+      setIsAuthenticated(Boolean(data.session));
+      setLoading(false);
+
+    }
+
+
+    checkSession();
+
+
+    // Listen for login/logout changes
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        setIsAuthenticated(Boolean(session));
+      }
+    );
+
+
+    return () => {
+      subscription.unsubscribe();
+    };
+
+  }, []);
+
+
+  return (
+    <CheckAuthContext.Provider
+      value={{
+        isAuthenticated,
+        loading,
+        setIsAuthenticated,
+      }}
+    >
       {children}
     </CheckAuthContext.Provider>
   );
-}
-
+};
