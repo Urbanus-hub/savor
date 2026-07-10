@@ -14,7 +14,12 @@ type UserContextType = {
     phone: string;
   }
 
-export const UserContext = createContext<UserContextType | null>(null)
+export const UserContext = createContext<UserContextType>({
+    user: null,
+    setUser: () => {},
+    loading: true,
+    setLoading: () => {},
+  });
 
 export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<user | null>(null)

@@ -1,6 +1,7 @@
-import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
-import { useState } from "react";
-import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { UserContext } from "@/contexts/userContext";
+import { getSession } from "@/services/auth";
+import { useContext, useEffect, useState } from "react";
+import { StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Index() {
@@ -8,7 +9,16 @@ export default function Index() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(true);
   const [isChecked, setChecked] = useState(false);
   const [focusedField, setFocusedField] = useState<string | null>(null);
+  const { user, loading } = useContext(UserContext);
+  console.log("user", user);
+  useEffect(() => {
+    const loadSession = async () => {
+      const session = await getSession();
+      console.log("session", session);
+    };
 
+    void loadSession();
+  }, []);
   return (
     <SafeAreaView style={styles.container}>
       {/* welcome text */}
@@ -17,14 +27,21 @@ export default function Index() {
           marginTop: 10,
           width: "100%",
           height: "50%",
-         
 
           display: "flex",
           alignItems: "center",
-          justifyContent:"space-around"
+          justifyContent: "space-around",
         }}
       >
         <Text>Hello there</Text>
+        <Text>{loading}</Text>
+        <Text>
+          {loading
+            ? "Loading..."
+            : user
+              ? `Welcome, ${user.full_name}`
+              : "Not logged in"}
+        </Text>
       </View>
     </SafeAreaView>
   );

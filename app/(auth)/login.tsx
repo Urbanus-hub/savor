@@ -1,5 +1,6 @@
 import { AntDesign, FontAwesome } from "@expo/vector-icons";
 import { Link, useRouter } from "expo-router";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { StatusBar } from "expo-status-bar";
 import { useContext, useState } from "react";
 import {
@@ -17,6 +18,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { AuthFeedbackModal } from "@/components/AuthFeedbackModal";
 import { UserContext } from "@/contexts/userContext";
 import { getUserDetails, login } from "@/services/auth";
+import { CheckAuthContext } from "@/contexts/checkAuthContext";
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(true);
@@ -32,7 +34,8 @@ export default function Login() {
     "success" | "error" | "info"
   >("info");
   const router = useRouter();
-  const { setUser } = useContext(UserContext) || {};
+  const { setUser,setLoading:setUserLoading } = useContext(UserContext) || {};
+  const {isAuthenticated,setIsAuthenticated} = useContext(CheckAuthContext) || {};
 
   const openFeedback = (
     title: string,
@@ -70,11 +73,21 @@ export default function Login() {
 
     if (setUser && userDetails) {
       setUser(userDetails);
+      const session = data?.session;
+      if (session) {
+        setIsAuthenticated(true);
+        //store session in local storage
+         await AsyncStorage.setItem('userSession', JSON.stringify(session));
+
+      }
+      setUserLoading(false);
+
     }
 
     setLoading(false);
 
     openFeedback("Welcome back", "You have signed in successfully.", "success");
+    
   };
 
   return (
